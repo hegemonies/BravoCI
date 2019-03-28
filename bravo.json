@@ -1,13 +1,19 @@
-[
-  {
-    "compile":"gradle"
+{
+  "config": {
+    "compile": "gradle"
   },
-  {
-    "title":"Step1",
-    "cmd":"gradle build",
-    "title":"Step2",
-    "cmd":"gradle run",
-    "title":"Step3",
-    "cmd":"gradle clean"
-  }
-]
+  "steps": [
+    {
+    "title": "Step1",
+    "cmd": "gradle build"
+    },
+    {
+    "title": "Step2",
+    "cmd": "gradle run"
+    },
+    {
+    "title": "Step3",
+    "cmd": "gradle clean"
+    }
+  ]
+}
