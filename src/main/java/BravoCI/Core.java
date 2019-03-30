@@ -1,41 +1,36 @@
 package BravoCI;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import BravoCI.Tests.Generator.Config;
+import BravoCI.Tests.Generator.Generator;
+import BravoCI.Tests.Generator.Step;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.util.List;
+
 public class Core {
 	public static void main(String... args) {
-		JSONParser jsonParser = new JSONParser();
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		Gson gson = gsonBuilder.create();
 
 		try {
 			FileReader fileReader = new FileReader("bravo.json");
-			try {
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(fileReader);
+			Generator generator = gson.fromJson(fileReader, Generator.class);
 
-				JSONObject config = (JSONObject) jsonObject.get("config");
+			System.out.println(generator.getConfig().getCompile());
 
-				System.out.println("Config");
-				System.out.println(config.get("compile"));
-
-				JSONArray steps = (JSONArray) jsonObject.get("steps");
-
-				System.out.println("Steps");
-				for (Object obj : steps) {
-					JSONObject step = (JSONObject) obj;
-
-					System.out.println(step.get("title"));
-					System.out.println(step.get("cmd"));
-				}
-			} catch (ParseException exception) {
-				exception.printStackTrace();
+			List<Step> steps = generator.getSteps();
+			for (Step step : steps) {
+				System.out.println(step.getTitle());
+				System.out.println(step.getCmd());
 			}
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
+
 	}
 }
