@@ -1,25 +1,18 @@
 package BravoCI.Tests.Generator;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.*;
 
 public class Generator {
-	private Config config;
-	private List<Step> steps;
+	public static void scriptGeneration(Content content, String path) {
+		File file = new File(path + "\\bravo.sh");
 
-	public Config getConfig() {
-		return config;
-	}
-
-	public List<Step> getSteps() {
-		return this.steps;
-	}
-
-	public void scriptGeneration() {
-		File file = new File("bravo.sh");
 		try {
+			if (file.exists()) {
+				file.delete();
+			}
 			file.createNewFile();
 			file.setExecutable(true);
 
@@ -27,7 +20,7 @@ public class Generator {
 			fileWriter.write("#!/bin/bash\n\n");
 			fileWriter.flush();
 
-			for (Step step : this.steps) {
+			for (Step step : content.getSteps()) {
 				fileWriter.write(step.getCmd() + "\n");
 				fileWriter.flush();
 			}
@@ -35,6 +28,38 @@ public class Generator {
 			fileWriter.close();
 		} catch (IOException exception) {
 			exception.printStackTrace();
+		}
+	}
+
+	public static Content readJSON(String path) throws FileNotFoundException {
+		File file = new File(path + "\\bravo.json");
+
+		if (!file.exists()) {
+			throw new FileNotFoundException();
+		}
+
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		Gson gson = gsonBuilder.create();
+
+		try (FileReader fileReader = new FileReader(file)) {
+			Content content = gson.fromJson(fileReader, Content.class);
+
+			if (content != null) {
+				return content;
+			}
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static void main(String... args) { // for test
+		try {
+			Content content = Generator.readJSON("D:\\git\\BravoCI");
+			Generator.scriptGeneration(content, "D:\\git\\BravoCI");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 }

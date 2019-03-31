@@ -1,9 +1,14 @@
 package BravoCI.Tests.Generator;
 
 public class Config {
-	private String compile;
+	private String compiler;
 
 	public String getCompile() {
-		return this.compile;
+		return this.compiler;
+	}
+
+	@Override
+	public String toString() {
+		return "Compiler: " + compiler;
 	}
 }

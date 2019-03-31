@@ -11,4 +11,9 @@ public class Step {
 	public String getCmd() {
 		return this.cmd;
 	}
+
+	@Override
+	public String toString() {
+		return title + ": " + cmd;
+	}
 }

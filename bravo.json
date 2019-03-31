@@ -1,6 +1,6 @@
 {
   "config": {
-    "compile": "gradle"
+    "compiler": "gradle"
   },
   "steps": [
     {
