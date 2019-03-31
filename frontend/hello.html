@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>BravoCI</title>
+
+        <link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+
+		<div id="adding">
+			Добавление репозитория для тестирования
+			<form id="adding_form">
+                <b>Name</b>
+				<input type="text" size="15" name="Name" value="">
+                <b>Repository</b>
+				<input type="text" size="20" name="Repository" value="">
+				<input type="button" value="Add" onclick="add(this.form)">
+			</form>
+		</div>
+
+		<div id="search">
+			Поиск репозитория
+			<form id="adding_form">
+                <b>Name</b>
+				<input type="text" size="15" name="Name" value="">
+                <!-- <b>Repository</b>
+				<input type="text" size="20" name="Repository" value=""> -->
+				<input type="button" value="Search" onclick="search(this.form)">
+			</form>
+
+			<div>
+				История пользователя:
+				<div id="user-history"></div>
+			</div>
+		</div>
+
+		<script src="js/jquery-3.3.1.js"></script>
+		<script src="js/handler.js"></script>
+
+	</body>
+</html>
