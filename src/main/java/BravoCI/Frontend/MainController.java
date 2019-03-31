@@ -1,6 +1,9 @@
 package BravoCI.Frontend;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,32 +15,27 @@ public class MainController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MongoOperations mongoOperations;
+
     @RequestMapping("/")
     public String hello() {
         return "hello";
     }
 
     @RequestMapping("/add")
-    public String addUser(@RequestParam(name = "Name", required = true) String Name) {
-        userRepository.save(new User(Name));
-
-        return "OK";
-    }
-
-    @RequestMapping("/addCommit")
-    public String addCommit(@RequestParam(name = "Name", required = true) String Name,
-                            @RequestParam(name = "Commit", required = true) String Commit) {
-        User user = search(Name);
-
-        if (user == null) {
-            return "bad";
+    public String addUser(@RequestParam(name = "name", required = true) String name,
+                          @RequestParam(name = "repo", required = true) String repository) {
+        if (userRepository.findAll().contains(new User(name))) {
+            User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
+            assert u != null;
+            u.addRepository(repository);
+            userRepository.save(u);
+        } else {
+            userRepository.save(new User(name, repository));
         }
 
-        user.addCommit(new CommitInfo(Commit, null, false));
-
-        userRepository.save(user);
-
-        return "good";
+        return "OK";
     }
 
     @RequestMapping("/showAll")
@@ -45,13 +43,8 @@ public class MainController {
         return userRepository.findAll();
     }
 
-    private User search(String name) {
-        for (User user : userRepository.findAll()) {
-            if (user.getName().equals(name)) {
-                return user;
-            }
-        }
-
-        return null;
+    @RequestMapping("/search")
+    private User search(@RequestParam(name = "name", required = true) String name) {
+        return mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
     }
 }

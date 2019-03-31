@@ -8,29 +8,47 @@ import java.util.List;
 public class User {
     @Id
     String id;
-    String Name;
-    List<CommitInfo> commits = new ArrayList<>();
+    private String name;
+    private List<Repository> repositories = new ArrayList<>();
 
-    User() {}
+    public User() {}
 
-    User(String Name) {
-        this.Name = Name;
+    public User(String name) {
+        this.name = name;
     }
 
-    User(String Name, CommitInfo commit) {
-        this.Name = Name;
-        commits.add(commit);
-    }
+    public User(String name, String repository) {
+        this.name = name;
 
-    public void addCommit(CommitInfo commit) {
-        commits.add(commit);
+        System.out.println(name + " contain " + repository + "? : " + repositories.contains(repository));
+
+        if (!repositories.contains(repository)) {
+            repositories.add(new Repository(repository));
+        }
     }
 
     public String getName() {
-        return Name;
+        return this.name;
     }
 
-    public List<CommitInfo> getCommits() {
-        return commits;
+    public List<Repository> getRepositories() {
+        return repositories;
+    }
+
+    public void addRepository(String repository) {
+        Repository r = new Repository(repository);
+        if (!repositories.contains(r)) {
+            repositories.add(r);
+        }
+    }
+
+    public void addCommit(String repository, CommitInfo commit) {
+        repositories.get(repositories.indexOf(repository)).add(commit);
+    }
+
+    @Override
+    public boolean equals(Object user) {
+        User u = (User) user;
+        return this.name.equals(u.getName());
     }
 }
