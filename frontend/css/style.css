@@ -8,10 +8,11 @@ div {
 	margin: 20px auto;
 }
 
-table {
-	border: 3px dashed #0f0f0f;
-	width: 500px;
-	padding: 0;
-	margin: 20px auto;
-	align-self: auto;
+#adding {
+	margin-top: 10px;
+	padding: 10px;
+}
+
+#adding_form {
+	margin-top: 10px;
 }
