@@ -3,7 +3,7 @@ package BravoCI.Tests.Generator;
 public class Config {
 	private String compiler;
 
-	public String getCompile() {
+	public String getCompiler() {
 		return this.compiler;
 	}
 

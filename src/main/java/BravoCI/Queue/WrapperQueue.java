@@ -1,4 +1,4 @@
-package BravoCI.Frontend;
+package BravoCI.Queue;
 
 import java.io.IOException;
 import java.io.InputStream;
