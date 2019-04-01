@@ -35,6 +35,8 @@ public class MainController {
             userRepository.save(new User(name, repository));
         }
 
+        WrapperQueue.addToQueue(name, repository);
+
         return "OK";
     }
 

@@ -37,9 +37,4 @@ public class Queue {
             }
         }
     }
-
-    public static void main(String... args) {
-        int port = 9999;
-        new Queue(port).up();
-    }
 }
