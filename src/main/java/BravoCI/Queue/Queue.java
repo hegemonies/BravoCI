@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Queue {
+public class Queue implements Runnable {
     private ArrayBlockingQueue<Package> queue = new ArrayBlockingQueue<Package>(100, true);
     private ServerSocket socket;
     private int port;
@@ -14,7 +14,8 @@ public class Queue {
         this.port = port;
     }
 
-    public void up() {
+    @Override
+    public void run() {
         try {
             socket = new ServerSocket(port);
             System.out.println("Server upped");
