@@ -19,8 +19,16 @@ public class BackendHandler implements Runnable {
 
     @Override
     public void run() {
-        this.prepareToTesting();
-        this.startTesting();
+        while (true) {
+            this.prepareToTesting();
+            this.startTesting();
+
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void prepareToTesting() {
@@ -29,7 +37,25 @@ public class BackendHandler implements Runnable {
 
     private void startTesting() {
         String request = WrapperQueue.getFromQueue();
+
+        if (request.equals("EMPTY")) {
+            return;
+        }
+
+        File folderLocale = new File("/repos");
+        if (!folderLocale.exists()) {
+            folderLocale.mkdir();
+        }
+
         String localeVolume = "/repos/" + request;
+
+        String username = request.split(":")[0];
+
+        File userFolder = new File("/repos/" + username);
+        if (!userFolder.exists()) {
+            userFolder.mkdir();
+        }
+
         String shareVolume = localeVolume +":/home";
 
         Content content = null;

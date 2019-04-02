@@ -7,11 +7,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class Core {
-    public static void main(String... args) {
-        int port = 9999;
-        new Thread(new Queue(port)).start();
-        new Thread(new BackendHandler()).start();
+    private final int port = 9999;
 
+    Core() {
+        new Thread(new Queue(port)).start();
+    }
+
+    public static void main(String... args) {
         SpringApplication.run(Core.class);
     }
 }

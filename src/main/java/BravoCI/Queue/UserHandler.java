@@ -43,12 +43,20 @@ public class UserHandler implements Runnable {
                 System.out.println("action: " + action);
 
                 if (action.equals("GET")) {
-                    System.out.println("size of queue: " + queue.size());
-                    System.out.println("answer for GET: " + queue.peek().toString());
+                    int queueSize = queue.size();
+                    System.out.println("size of queue: " + queueSize);
 
-                    Package tmpPackage = queue.poll();
-                    if (tmpPackage != null) {
-                        out.println(tmpPackage.toString());
+                    if (queueSize > 0) {
+                        System.out.println("answer for GET: " + queue.peek().toString());
+
+                        Package tmpPackage = queue.poll();
+                        if (tmpPackage != null) {
+                            out.println(tmpPackage.toString());
+                            out.flush();
+                        }
+                    } else {
+                        String answer = "EMPTY";
+                        out.println(answer);
                         out.flush();
                     }
                 } else if (action.equals("SET")) {
