@@ -16,48 +16,54 @@ import java.util.List;
 
 public class BackendHandler implements Runnable {
     DockerClient dockerClient = DockerClientBuilder.getInstance().build();
+    String pathLocaleFolder = "/repos";
+    String username;
+    String repo;
+    File folderLocale;
+    File userFolder;
+    String localeVolume;
+    String shareVolume;
 
     @Override
     public void run() {
+        String request;
         while (true) {
-            this.prepareToTesting();
-            this.startTesting();
+            request = WrapperQueue.getFromQueue();
+            username = request.split(":")[0];
+            repo = request.split(":")[1];
 
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (!request.equals("EMPTY")) {
+                this.prepareToTesting();
+                this.startTesting();
+                this.afterTesting();
+            } else {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     private void prepareToTesting() {
-        // todo: work with Github API
-    }
-
-    private void startTesting() {
-        String request = WrapperQueue.getFromQueue();
-
-        if (request.equals("EMPTY")) {
-            return;
-        }
-
-        File folderLocale = new File("/repos");
+        folderLocale = new File(pathLocaleFolder);
         if (!folderLocale.exists()) {
             folderLocale.mkdir();
         }
 
-        String localeVolume = "/repos/" + request;
-
-        String username = request.split(":")[0];
-
-        File userFolder = new File("/repos/" + username);
+        userFolder = new File(pathLocaleFolder + "/" + username);
         if (!userFolder.exists()) {
             userFolder.mkdir();
         }
 
-        String shareVolume = localeVolume +":/home";
+        localeVolume = pathLocaleFolder + "/" + username + "/" + repo;
+        shareVolume = localeVolume +":/media";
 
+        // todo need clone repo from github using scripts
+    }
+
+    private void startTesting() {
         Content content = null;
         try {
             content = Generator.readJSON(localeVolume);
@@ -74,7 +80,7 @@ public class BackendHandler implements Runnable {
                 .withImageNameFilter(compiler)
                 .exec(); // todo: check for performance
 
-        for (Image image : images) {
+        for (Image image : images) { // todo need refactor
             if (image.getRepoTags().equals(compiler)) {
                 imageExist = true;
                 imageTag = image.getRepoTags()[0];
@@ -108,10 +114,17 @@ public class BackendHandler implements Runnable {
             }
 
             File logs = new File(localeVolume + "/logs.txt");
-            logs.renameTo(new File("/results/" + request + "/logs.txt"));
+            logs.renameTo(new File("/results/" + username + "/" + repo + "/logs.txt"));
         } else {
             writeToLog("The necessary image does not exist");
         }
+    }
+
+    private void afterTesting() {
+        username = null;
+        repo = null;
+        folderLocale = null;
+        userFolder = null;
     }
 
     private void writeToLog(String string) {
