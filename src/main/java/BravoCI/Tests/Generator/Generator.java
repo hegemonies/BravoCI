@@ -7,7 +7,7 @@ import java.io.*;
 
 public class Generator {
 	public static void scriptGeneration(Content content, String path) {
-		File file = new File(path + "\\bravo.sh");
+		File file = new File(path + "/bravo.sh");
 
 		try {
 			if (file.exists()) {
@@ -20,8 +20,11 @@ public class Generator {
 			fileWriter.write("#!/bin/bash\n\n");
 			fileWriter.flush();
 
+			fileWriter.write("date &> logs.txt\n\n");
+			fileWriter.flush();
+
 			for (Step step : content.getSteps()) {
-				fileWriter.write(step.getCmd() + "\n");
+				fileWriter.write(step.getCmd() + " &>> logs.txt\n");
 				fileWriter.flush();
 			}
 
@@ -32,7 +35,7 @@ public class Generator {
 	}
 
 	public static Content readJSON(String path) throws FileNotFoundException {
-		File file = new File(path + "\\bravo.json");
+		File file = new File(path + "/bravo.json");
 
 		if (!file.exists()) {
 			throw new FileNotFoundException();
@@ -52,14 +55,5 @@ public class Generator {
 		}
 
 		return null;
-	}
-
-	public static void main(String... args) { // for test
-		try {
-			Content content = Generator.readJSON("D:\\git\\BravoCI");
-			Generator.scriptGeneration(content, "D:\\git\\BravoCI");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
 }
