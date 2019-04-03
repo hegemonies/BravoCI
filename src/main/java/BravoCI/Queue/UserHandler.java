@@ -33,45 +33,51 @@ public class UserHandler implements Runnable {
     @Override
     public void run() {
         while (true) {
-            String request = in.next();
+            try {
+                if (in.hasNext()) {
+                    String request = in.next();
 
-            System.out.println("queue request: " + request);
+                    System.out.println("queue request: " + request);
 
-            if (request.length() >= 3) {
-                String action = request.substring(0, 3);
+                    if (request.length() >= 3) {
+                        String action = request.substring(0, 3);
 
-                System.out.println("action: " + action);
+                        System.out.println("action: " + action);
 
-                if (action.equals("GET")) {
-                    int queueSize = queue.size();
-                    System.out.println("size of queue: " + queueSize);
+                        if (action.equals("GET")) {
+                            int queueSize = queue.size();
+                            System.out.println("size of queue: " + queueSize);
 
-                    if (queueSize > 0) {
-                        System.out.println("answer for GET: " + queue.peek().toString());
+                            if (queueSize > 0) {
+                                System.out.println("answer for GET: " + queue.peek().toString());
 
-                        Package tmpPackage = queue.poll();
-                        if (tmpPackage != null) {
-                            out.println(tmpPackage.toString());
-                            out.flush();
+                                Package tmpPackage = queue.poll();
+                                if (tmpPackage != null) {
+                                    out.println(tmpPackage.toString());
+                                    out.flush();
+                                }
+                            } else {
+                                String answer = "EMPTY";
+                                out.println(answer);
+                                out.flush();
+                            }
+                        } else if (action.equals("SET")) {
+                            String content = request.substring(4);
+
+                            if (content.length() >= 3 && content.contains("/")) {
+                                System.out.println("content: " + content);
+
+                                String[] userInfo = content.split("/");
+                                String userName = userInfo[0];
+                                String userRepository = userInfo[1];
+
+                                queue.add(new Package(userName, userRepository));
+                            }
                         }
-                    } else {
-                        String answer = "EMPTY";
-                        out.println(answer);
-                        out.flush();
-                    }
-                } else if (action.equals("SET")) {
-                    String content = request.substring(4);
-
-                    if (content.length() >= 3 && content.contains("/")) {
-                        System.out.println("content: " + content);
-
-                        String[] userInfo = content.split("/");
-                        String userName = userInfo[0];
-                        String userRepository = userInfo[1];
-
-                        queue.add(new Package(userName, userRepository));
                     }
                 }
+            } catch (Exception exc) {
+                System.out.println(exc.getMessage());
             }
         }
     }

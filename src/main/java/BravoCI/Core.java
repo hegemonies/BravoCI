@@ -11,6 +11,7 @@ public class Core {
 
     Core() {
         new Thread(new Queue(port)).start();
+        new Thread(new ZooKeeper(1)).start();
     }
 
     public static void main(String... args) {
