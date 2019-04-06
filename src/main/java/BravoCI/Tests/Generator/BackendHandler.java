@@ -9,10 +9,7 @@ import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.core.DockerClientBuilder;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +19,9 @@ import static com.github.dockerjava.api.model.HostConfig.newHostConfig;
 
 public class BackendHandler implements Runnable {
     private final DockerClient dockerClient = DockerClientBuilder.getInstance().build();
-    private final String pathLocaleFolder = "/home/dan/repos";
-    private final String pathLogs = "/home/dan/results";
+    private final String USERNAME = System.getenv("USERNAME");
+    private final String pathLocaleFolder = String.format("/home/%s/repos", USERNAME);
+    private final String pathLogs = String.format("/home/%s/results", USERNAME);
     private String username;
     private String repo;
     private File folderLocale;
@@ -48,10 +46,11 @@ public class BackendHandler implements Runnable {
 
                 this.prepareToTesting();
                 this.startTesting();
-                this.afterTesting();
 
                 System.out.println("thread [" + Thread.currentThread().getId() + "] finish task for "
                         + username + " " + repo);
+
+                this.afterTesting();
             } else {
                 try {
                     Thread.sleep(10000);
@@ -80,6 +79,11 @@ public class BackendHandler implements Runnable {
         }
 
         userLogsFolder = new File(pathLogs + "/" + username);
+        if (!userLogsFolder.exists()) {
+            userLogsFolder.mkdir();
+        }
+
+        File userLogsFolder = new File(pathLogs + "/" + username + "/" + repo);
         if (!userLogsFolder.exists()) {
             userLogsFolder.mkdir();
         }
@@ -166,6 +170,19 @@ public class BackendHandler implements Runnable {
         }
 
         File logs = new File(localeVolume + "/logs.txt");
+
+        try (FileReader reader = new FileReader(logs)) {
+            char[] buffer = new char[(int) logs.length()];
+            reader.read(buffer);
+            String raw = new String(buffer);
+            System.out.println("logs: ");
+            System.out.println(raw);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         logs.renameTo(new File(pathLogs + "/" + username + "/" + repo + "/logs.txt"));
 
         // delete repo
