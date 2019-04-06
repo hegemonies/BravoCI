@@ -8,12 +8,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class WrapperQueue {
-    private static final String host = "127.0.0.1";
-    private static final int port = 9999;
-
-    public static void addToQueue(String name, String repository) {
+    public static void addToQueue(String name, String repository, Socket socket) {
         try {
-            Socket socket = new Socket(host, port);
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter out = new PrintWriter(outputStream);
 
@@ -26,11 +22,10 @@ public class WrapperQueue {
         }
     }
 
-    public static String getFromQueue() {
+    public static String getFromQueue(Socket socket) {
         String answer = null;
 
         try {
-            Socket socket = new Socket(host, port);
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
 

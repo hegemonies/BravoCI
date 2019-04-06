@@ -10,6 +10,7 @@ import com.github.dockerjava.core.DockerClientBuilder;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +20,10 @@ import static com.github.dockerjava.api.model.HostConfig.newHostConfig;
 
 public class BackendHandler implements Runnable {
     private final DockerClient dockerClient = DockerClientBuilder.getInstance().build();
-    private final String USERNAME = System.getenv("USERNAME");
-    private final String pathLocaleFolder = String.format("/home/%s/repos", USERNAME);
-    private final String pathLogs = String.format("/home/%s/results", USERNAME);
+    private Socket socket = null;
+    private String USERNAME = System.getenv("USERNAME");
+    private String pathLocaleFolder = String.format("/home/%s/repos", USERNAME);
+    private String pathLogs = String.format("/home/%s/results", USERNAME);
     private String username;
     private String repo;
     private File folderLocale;
@@ -31,32 +33,54 @@ public class BackendHandler implements Runnable {
     private String localeVolume;
     private String shareVolume;
 
+    public BackendHandler(String host, int port) {
+        if (USERNAME == null) {
+            USERNAME = System.getenv("USER");
+            pathLocaleFolder = String.format("/home/%s/repos", USERNAME);
+            pathLogs = String.format("/home/%s/results", USERNAME);
+        }
+
+        try {
+            socket = new Socket(host, port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
+
+        System.out.println("pathLocaleFolder = " + pathLocaleFolder);
+        System.out.println("pathLogs = " + pathLogs);
+
         String request;
         while (true) {
-            request = WrapperQueue.getFromQueue();
+            try {
+                request = WrapperQueue.getFromQueue(this.socket);
 
-            if (!request.equals("EMPTY")) {
-                username = request.split(":")[0];
-                repo = request.split(":")[1];
+                if (!request.equals("EMPTY")) {
+                    username = request.split(":")[0];
+                    repo = request.split(":")[1];
 
-                System.out.println("thread [" + Thread.currentThread().getId() + "] getting task for "
-                        + username + " " + repo);
+                    System.out.println("thread [" + Thread.currentThread().getId() + "] getting task for "
+                            + username + " " + repo);
 
-                this.prepareToTesting();
-                this.startTesting();
+                    this.prepareToTesting();
+                    this.startTesting();
 
-                System.out.println("thread [" + Thread.currentThread().getId() + "] finish task for "
-                        + username + " " + repo);
+                    System.out.println("thread [" + Thread.currentThread().getId() + "] finish task for "
+                            + username + " " + repo);
 
-                this.afterTesting();
-            } else {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    this.afterTesting();
+                } else {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }
@@ -170,19 +194,6 @@ public class BackendHandler implements Runnable {
         }
 
         File logs = new File(localeVolume + "/logs.txt");
-
-        try (FileReader reader = new FileReader(logs)) {
-            char[] buffer = new char[(int) logs.length()];
-            reader.read(buffer);
-            String raw = new String(buffer);
-            System.out.println("logs: ");
-            System.out.println(raw);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         logs.renameTo(new File(pathLogs + "/" + username + "/" + repo + "/logs.txt"));
 
         // delete repo

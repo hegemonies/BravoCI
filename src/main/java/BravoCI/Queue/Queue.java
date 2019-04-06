@@ -18,7 +18,7 @@ public class Queue implements Runnable {
     public void run() {
         try {
             socket = new ServerSocket(port);
-            System.out.println("Server upped");
+            System.out.println("Queue upped");
             handler();
         } catch (IOException e) {
             e.printStackTrace();

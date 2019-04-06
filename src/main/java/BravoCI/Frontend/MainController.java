@@ -9,7 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
+import java.util.Properties;
 
 @RestController
 public class MainController {
@@ -18,6 +23,25 @@ public class MainController {
 
     @Autowired
     private MongoOperations mongoOperations;
+
+    private Socket socket;
+
+    public MainController() {
+        try {
+            Properties properties = new Properties();
+            String propPath = new File(".").getAbsolutePath();
+            propPath = propPath.substring(0, propPath.length() - 1) + "src/main/resources/queue.properties";
+            properties.load(new FileReader(propPath));
+
+            String host = properties.getProperty("queue-host");
+            String tmp_port = properties.getProperty("queue-port");
+            int port = Integer.parseInt(tmp_port);
+
+            socket = new Socket(host, port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @RequestMapping("/")
     public String hello() {
@@ -36,7 +60,7 @@ public class MainController {
             userRepository.save(new User(name, repository));
         }
 
-        WrapperQueue.addToQueue(name, repository);
+        WrapperQueue.addToQueue(name, repository, socket);
 
         return "OK";
     }
