@@ -5,9 +5,7 @@ function add(form) {
 
 	$.ajax({
 		url: "http://localhost:8080/add?name=" + name + "&repo=" + repo
-	}).then(function (data) {
-        alert(data);
-    });
+	});
 }
 
 function search(form) {
