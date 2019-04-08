@@ -53,10 +53,11 @@ public class MainController {
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
+        String userFolder = "/home/sandra/repos/" + name + "/";
         try {
             Git git = Git.cloneRepository()
                     .setURI("https://github.com/" + name + "/" + repository + ".git")
-                    .setDirectory(new File("/home/sandra/repos/" + name + "/" +repository + "/"))
+                    .setDirectory(new File(userFolder + repository + "/"))
                     .call();
 
             if (userRepository.findAll().contains(new User(name))) {
@@ -72,6 +73,7 @@ public class MainController {
 
             git.close();
         } catch (GitAPIException exception) {
+            new File(userFolder).delete();
             System.out.println(exception.getMessage());
             return "Invalid data: Name or Repository";
         }
