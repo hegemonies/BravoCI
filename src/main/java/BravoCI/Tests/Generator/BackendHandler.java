@@ -114,20 +114,6 @@ public class BackendHandler implements Runnable {
 
         localeVolume = pathLocaleFolder + "/" + username + "/" + repo;
         shareVolume = localeVolume +":/media";
-
-        // cloning repo from github
-        String url_repo = "https://github.com/" + username + "/" + repo;
-
-        ProcessBuilder processBuilder = new ProcessBuilder("./clone_repo.sh",
-                url_repo,
-                pathLocaleFolder + "/" + username);
-
-        try {
-            Process process = processBuilder.start();
-            process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void startTesting() {

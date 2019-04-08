@@ -1,6 +1,8 @@
 package BravoCI.Frontend;
 
 import BravoCI.Queue.WrapperQueue;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -51,16 +53,28 @@ public class MainController {
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
-        if (userRepository.findAll().contains(new User(name))) {
-            User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
-            assert u != null;
-            u.addRepository(repository);
-            userRepository.save(u);
-        } else {
-            userRepository.save(new User(name, repository));
-        }
+        try {
+            Git git = Git.cloneRepository()
+                    .setURI("https://github.com/" + name + "/" + repository + ".git")
+                    .setDirectory(new File("/home/sandra/repos/" + name + "/" +repository + "/"))
+                    .call();
 
-        WrapperQueue.addToQueue(name, repository, socket);
+            if (userRepository.findAll().contains(new User(name))) {
+                User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
+                assert u != null;
+                u.addRepository(repository);
+                userRepository.save(u);
+            } else {
+                userRepository.save(new User(name, repository));
+            }
+
+            WrapperQueue.addToQueue(name, repository, socket);
+
+            git.close();
+        } catch (GitAPIException exception) {
+            System.out.println(exception.getMessage());
+            return "Invalid data: Name or Repository";
+        }
 
         return "OK";
     }
