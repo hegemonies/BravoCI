@@ -27,6 +27,7 @@ public class MainController {
     private MongoOperations mongoOperations;
 
     private Socket socket;
+    private String USERNAME = System.getenv("USERNAME");
 
     public MainController() {
         try {
@@ -40,6 +41,9 @@ public class MainController {
             int port = Integer.parseInt(tmp_port);
 
             socket = new Socket(host, port);
+
+            if (this.USERNAME == null)
+                this.USERNAME = System.getenv("USER");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,11 +57,11 @@ public class MainController {
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
-        String userFolder = "/home/sandra/repos/" + name + "/";
+        String pathUserFolder = "/home/" + USERNAME + "/repos/" + name + "/";
         try {
             Git git = Git.cloneRepository()
                     .setURI("https://github.com/" + name + "/" + repository + ".git")
-                    .setDirectory(new File(userFolder + repository + "/"))
+                    .setDirectory(new File(pathUserFolder + repository + "/"))
                     .call();
 
             if (userRepository.findAll().contains(new User(name))) {
@@ -73,7 +77,7 @@ public class MainController {
 
             git.close();
         } catch (GitAPIException exception) {
-            new File(userFolder).delete();
+            new File(pathUserFolder).delete();
             System.out.println(exception.getMessage());
             return "Invalid data: Name or Repository";
         }
