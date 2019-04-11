@@ -9,7 +9,6 @@ import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.core.DockerClientBuilder;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.Socket;
@@ -27,6 +26,7 @@ public class BackendHandler implements Runnable {
     private String repo;
     private String localeVolumeDocker;
     private String shareVolumeDocker;
+    private String logsFolder;
     private Configurator configurator;
 
     public BackendHandler(String host, int port, Configurator configurator) {
@@ -77,6 +77,7 @@ public class BackendHandler implements Runnable {
         configurator.configureUserFolders(username, repo);
         localeVolumeDocker = configurator.getReposFolder() + "/" + username + "/" + repo;
         shareVolumeDocker = localeVolumeDocker +":/media";
+        logsFolder = configurator.getResultsFolder() + "/" + username + "/" + repo;
     }
 
     private void startTesting() {
@@ -92,7 +93,6 @@ public class BackendHandler implements Runnable {
         String compiler = "bravo_" + Objects.requireNonNull(content).getConfig().getCompiler();
 
         // running tests inside the docker container
-
         boolean imageExist = false;
         String imageTag = null;
         List<Image> images = dockerClient.listImagesCmd()
@@ -143,7 +143,7 @@ public class BackendHandler implements Runnable {
         }
 
         File logs = new File(localeVolumeDocker + "/logs.txt");
-        logs.renameTo(new File(configurator.getResultsFolder() + "/" + username + "/" + repo + "/logs.txt"));
+        logs.renameTo(new File(logsFolder + "/logs.txt"));
 
         // delete repo
         try {
@@ -159,7 +159,7 @@ public class BackendHandler implements Runnable {
     }
 
     private void writeToLog(String string) {
-        File file = new File(Paths.get(".").toAbsolutePath().normalize().toString() +"/logs.txt");
+        File file = new File(logsFolder + "/logs.txt");
 
         try {
             if (file.exists()) {
@@ -169,7 +169,6 @@ public class BackendHandler implements Runnable {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(string);
             fileWriter.flush();
-
         } catch (Exception exc) {
             exc.printStackTrace();
         }
