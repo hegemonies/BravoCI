@@ -1,5 +1,6 @@
 package BravoCI;
 
+import BravoCI.ConfiguratorTreeFolders.Configurator;
 import BravoCI.Queue.Queue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,8 +17,9 @@ public class Core {
     private final int countAnimals = 1;
 
     Core() {
+        Configurator configurator = new Configurator();
         new Thread(new Queue(port)).start();
-        new Thread(new ZooKeeper(host, port, countAnimals)).start();
+        new Thread(new ZooKeeper(host, port, countAnimals, configurator)).start();
     }
 
     public static void main(String... args) {

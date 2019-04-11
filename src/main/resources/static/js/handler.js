@@ -11,8 +11,6 @@ function add(form) {
 function search(form) {
 	const name = form.elements.Name.value;
 
-	const text = "{'_id':'5ca03cb8160bc126cf7e023e','name':'patrick','repositories':[{'name':'helloworld','commitInfos':['afnaom','3f3fm3','01fab']},{'name':'RenderEngine','commitInfos':['groga33','342lmb','09ba0j']}],'_class':'BravoCI.Frontend.User'}";
-
 	$.ajax({
 		type: "POST",
 		dataType: "text",
@@ -34,10 +32,10 @@ function search(form) {
 
 			content += '<td>' + json[i]['name'] + '</td>';
 
-			for (var j = 0; j < json[i].repositories.lenght; j++) {
+			for (var j = 0; j < json[i].repositories.length; j++) {
 				content += '<td>' + json[i].repositories[j]['name'] + '</td>';
 
-				for (var k = 0; k < json[i].repositories[j].lenght; k++) {
+				for (var k = 0; k < json[i].repositories[j].length; k++) {
 					content += '<td>' + json[i].repositories[j]['commitInfos'][k] + '</td>';
 					content += '</tr>';
 				}

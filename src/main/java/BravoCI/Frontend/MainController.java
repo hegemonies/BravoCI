@@ -52,7 +52,7 @@ public class MainController {
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
-        String pathUserFolder = "/home/" + USERNAME + "/repos/" + name + "/";
+        String pathUserFolder = "/home/" + USERNAME + "/bravoci/repos/" + name + "/";
         try {
             Git git = Git.cloneRepository()
                     .setURI("https://github.com/" + name + "/" + repository + ".git")
