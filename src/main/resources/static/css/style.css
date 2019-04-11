@@ -2,7 +2,7 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-div {
+div, h1 {
 	width: 600px;
 	padding: 0;
 	margin: 20px auto;

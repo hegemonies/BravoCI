@@ -49,11 +49,6 @@ public class MainController {
         }
     }
 
-    @RequestMapping("/")
-    public String hello() {
-        return "hello";
-    }
-
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {

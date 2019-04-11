@@ -18,6 +18,8 @@ function search(form) {
 		dataType: "text",
 		url: "http://localhost:8080/search?name=" + name
 	}).then(function (data) {
+	    console.log(data);
+
 		var content = '<table>';
 		content += '<tr>';
 		content += '<td>' + 'Name' + '</td>';
