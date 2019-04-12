@@ -8,12 +8,12 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class WrapperQueue {
-    public static void addToQueue(String name, String repository, Socket socket) {
+    public static void addToQueue(String name, String repository, String commitInfo, Socket socket) {
         try {
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter out = new PrintWriter(outputStream);
 
-            String request = "SET:" + name + "/" + repository;
+            String request = "SET:" + name + "/" + repository + "/" + commitInfo;
 
             out.println(request);
             out.flush();

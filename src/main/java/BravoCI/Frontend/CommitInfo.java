@@ -24,4 +24,12 @@ public class CommitInfo {
     public boolean isCheck() {
         return check;
     }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public void setCheck(boolean check) {
+        this.check = check;
+    }
 }

@@ -20,8 +20,27 @@ class Repository {
         return commitInfos;
     }
 
-    void add(CommitInfo commit) {
+    public void add(CommitInfo commit) {
         commitInfos.add(commit);
+    }
+
+    public void changeCommit(CommitInfo new_commit) {
+        for (CommitInfo commitInfo : commitInfos) {
+            if (commitInfo.getHashCommit().equals(new_commit.getHashCommit())) {
+                commitInfo.setResult(new_commit.getResult());
+                commitInfo.setCheck(new_commit.isCheck());
+            }
+        }
+    }
+
+    public CommitInfo getCommitInfo(String hash) {
+        for (CommitInfo commitInfo : commitInfos) {
+            if (commitInfo.getHashCommit().equals(hash)) {
+                return commitInfo;
+            }
+        }
+
+        return null;
     }
 
     @Override

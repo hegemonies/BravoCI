@@ -20,9 +20,7 @@ public class User {
     public User(String name, String repository) {
         this.name = name;
 
-        System.out.println(name + " contain " + repository + "? : " + repositories.contains(repository));
-
-        if (!repositories.contains(repository)) {
+        if (!repositories.contains(new Repository(repository))) {
             repositories.add(new Repository(repository));
         }
     }
@@ -42,8 +40,41 @@ public class User {
         }
     }
 
+    public Repository getRepository(String repository_name) {
+        for (Repository repo : repositories) {
+            if (repo.getName().equals(repository_name)) {
+                return repo;
+            }
+        }
+
+        return null;
+    }
+
     public void addCommit(String repository, CommitInfo commit) {
-        repositories.get(repositories.indexOf(repository)).add(commit);
+//        repositories.get(repositories.indexOf(repository)).add(commit);
+        for (Repository repo : repositories) {
+            if (repo.getName().equals(repository)) {
+                repo.add(commit);
+            }
+        }
+    }
+
+    public void changeCommit(String repository, CommitInfo commit) {
+        for (Repository repo : repositories) {
+            if (repo.getName().equals(repository)) {
+                repo.changeCommit(commit);
+            }
+        }
+    }
+
+    public CommitInfo getCommit(String repository, String hash) {
+        for (Repository _repository : repositories) {
+            if (_repository.getName().equals(repository)) {
+                return _repository.getCommitInfo(hash);
+            }
+        }
+
+        return null;
     }
 
     @Override

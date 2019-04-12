@@ -2,6 +2,7 @@ package BravoCI.ConfiguratorTreeFolders;
 
 
 import java.io.File;
+import java.util.Date;
 
 public class Configurator {
     private final String username = System.getenv("USERNAME");
@@ -21,7 +22,7 @@ public class Configurator {
         }
     }
 
-    public void configureUserFolders(String name, String repo) {
+    public void configureUserFolders(String name, String repo, String commitName) {
         File userFolder = new File(reposFolder + "/" + name);
         if (!userFolder.exists()) {
             userFolder.mkdir();
@@ -32,7 +33,10 @@ public class Configurator {
             userLogsFolder.mkdir();
         }
 
-        File logsFolder = new File(resultsFolder+ "/" + name + "/" + repo);
+        File logsFolder = new File(resultsFolder+ "/"
+                + name + "/"
+                + repo + "/"
+                + commitName);
         if (!logsFolder.exists()) {
             logsFolder.mkdir();
         }

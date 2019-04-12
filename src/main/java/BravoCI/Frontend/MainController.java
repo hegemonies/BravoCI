@@ -1,8 +1,10 @@
 package BravoCI.Frontend;
 
+import BravoCI.ConfiguratorTreeFolders.Configurator;
 import BravoCI.Queue.WrapperQueue;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,6 +28,8 @@ public class MainController {
 
     @Autowired
     private MongoOperations mongoOperations;
+
+    private Configurator configurator = new Configurator();
 
     private Socket socket;
     private String USERNAME = System.getenv("USERNAME");
@@ -59,16 +64,27 @@ public class MainController {
                     .setDirectory(new File(pathUserFolder + repository + "/"))
                     .call();
 
+
+            Iterable<RevCommit> logs = git.log().call();
+            String lastCommitName = logs.iterator().next().getName();
+            configurator.configureUserFolders(name, repository, lastCommitName);
+
             if (userRepository.findAll().contains(new User(name))) {
                 User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
                 assert u != null;
+                u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
                 u.addRepository(repository);
                 userRepository.save(u);
             } else {
-                userRepository.save(new User(name, repository));
+                User u = new User(name, repository);
+                u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
+                userRepository.save(u);
             }
 
-            WrapperQueue.addToQueue(name, repository, socket);
+            WrapperQueue.addToQueue(name,
+                    repository,
+                    lastCommitName + ":" + new Date().toString(),
+                    socket);
 
             git.close();
         } catch (GitAPIException exception) {
@@ -77,7 +93,7 @@ public class MainController {
             return "Invalid data: Name or Repository";
         }
 
-        return "OK";
+        return "Your request is being processed";
     }
 
     @RequestMapping("/showAll")
@@ -86,7 +102,12 @@ public class MainController {
     }
 
     @RequestMapping("/search")
-    private User search(@RequestParam(name = "name", required = true) String name) {
+    public User search(@RequestParam(name = "name", required = true) String name) {
         return mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
+    }
+
+    @RequestMapping("/searchrepo")
+    public List<User> searchRepository(@RequestParam(name = "name", required = true) String name) {
+        return mongoOperations.find(Query.query(Criteria.where("repositories.name").is(name)), User.class);
     }
 }

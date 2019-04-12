@@ -70,8 +70,9 @@ public class UserHandler implements Runnable {
                                 String[] userInfo = content.split("/");
                                 String userName = userInfo[0];
                                 String userRepository = userInfo[1];
+                                String commitInfo = userInfo[2];
 
-                                queue.add(new Package(userName, userRepository));
+                                queue.add(new Package(userName, userRepository, commitInfo));
                             }
                         }
                     }
