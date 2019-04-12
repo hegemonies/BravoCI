@@ -33,12 +33,17 @@ public class Configurator {
             userLogsFolder.mkdir();
         }
 
-        File logsFolder = new File(resultsFolder+ "/"
+        File logsFolder = new File(resultsFolder+ "/" + name + "/" + repo);
+        if (!logsFolder.exists()) {
+            logsFolder.mkdir();
+        }
+
+        File concreteLogsFolder = new File( resultsFolder+ "/"
                 + name + "/"
                 + repo + "/"
                 + commitName);
-        if (!logsFolder.exists()) {
-            logsFolder.mkdir();
+        if (!concreteLogsFolder.exists()) {
+            concreteLogsFolder.mkdir();
         }
     }
 

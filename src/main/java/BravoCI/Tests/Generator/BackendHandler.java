@@ -101,6 +101,7 @@ public class BackendHandler implements Runnable {
         Content content = null;
         try {
             content = Generator.readJSON(localeVolumeDocker);
+            System.out.println("CONTENT: " + content.toString());
             Generator.scriptGeneration(content, localeVolumeDocker);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -164,6 +165,7 @@ public class BackendHandler implements Runnable {
         logs.renameTo(new File(resultPathLogsFile));
 
         String targetFile = content.getConfig().getTargetFile();
+        System.out.println("Targer File: " + targetFile);
         setPathToTargetFile(targetFile);
 
         // move targer file
@@ -223,9 +225,9 @@ public class BackendHandler implements Runnable {
 
         for (File entry : folderEntries)  {
             if (entry.isDirectory())  {
-                this.processFilesFromFolder(entry, filename);
+                processFilesFromFolder(entry, filename);
             } else {
-                if (entry.getName().equals(filename)) {
+                if (entry.getName().contains(filename)) {
                     try {
                         this.pathToTargetFile = entry.getCanonicalPath();
                     } catch (IOException e) {
@@ -237,7 +239,8 @@ public class BackendHandler implements Runnable {
     }
 
     private void setPathToTargetFile(String filename) {
-        File thisFolder = new File(Paths.get(".").toAbsolutePath().normalize().toString());
+        System.out.println("LOOK HERE: " + configurator.getReposFolder() + "/" + username + "/" + repo);
+        File thisFolder = new File(configurator.getReposFolder() + "/" + username + "/" + repo);
         processFilesFromFolder(thisFolder, filename);
     }
 }

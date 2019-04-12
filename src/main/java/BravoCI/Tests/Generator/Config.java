@@ -9,7 +9,7 @@ public class Config {
 	}
 
 	public String getTargetFile() {
-		return targetFile;
+		return this.targetFile;
 	}
 
 	@Override
