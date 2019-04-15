@@ -24,9 +24,6 @@ import java.util.Properties;
 @RestController
 public class MainController {
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private MongoOperations mongoOperations;
 
     private Configurator configurator = new Configurator();
@@ -58,27 +55,29 @@ public class MainController {
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
         String pathUserFolder = "/home/" + USERNAME + "/bravoci/repos/" + name + "/";
-        try {
-            Git git = Git.cloneRepository()
-                    .setURI("https://github.com/" + name + "/" + repository + ".git")
-                    .setDirectory(new File(pathUserFolder + repository + "/"))
-                    .call();
+        String path = configurator.getReposFolder() + "/" + name + "/" + repository;
+        Git git = null;
 
+        try {
+            git = Git.cloneRepository()
+                .setURI("https://github.com/" + name + "/" + repository + ".git")
+                .setDirectory(new File(pathUserFolder + repository + "/"))
+                .call();
 
             Iterable<RevCommit> logs = git.log().call();
             String lastCommitName = logs.iterator().next().getName();
             configurator.configureUserFolders(name, repository, lastCommitName);
 
-            if (userRepository.findAll().contains(new User(name))) {
+            if (mongoOperations.findAll(User.class).contains(new User(name))) {
                 User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
                 assert u != null;
                 u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
                 u.addRepository(repository);
-                userRepository.save(u);
+                mongoOperations.save(u);
             } else {
                 User u = new User(name, repository);
                 u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
-                userRepository.save(u);
+                mongoOperations.save(u);
             }
 
             WrapperQueue.addToQueue(name,
@@ -86,11 +85,12 @@ public class MainController {
                     lastCommitName + ":" + new Date().toString(),
                     socket);
 
-            git.close();
         } catch (GitAPIException exception) {
             new File(pathUserFolder).delete();
-            System.out.println(exception.getMessage());
+            exception.printStackTrace();
             return "Invalid data: Name or Repository";
+        } finally {
+            git.close();
         }
 
         return "Your request is being processed";
@@ -98,7 +98,7 @@ public class MainController {
 
     @RequestMapping("/showAll")
     public List<User> showAll() {
-        return userRepository.findAll();
+        return mongoOperations.findAll(User.class);
     }
 
     @RequestMapping("/search")

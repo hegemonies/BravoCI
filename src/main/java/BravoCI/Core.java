@@ -1,9 +1,11 @@
 package BravoCI;
 
 import BravoCI.ConfiguratorTreeFolders.Configurator;
-import BravoCI.Queue.Queue;
+import BravoCI.Queue.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 import java.io.File;
 import java.io.FileReader;
@@ -11,6 +13,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 @SpringBootApplication
+@Import(AppConfig.class)
+@ComponentScan("BravoCI")
 public class Core {
     private static String host;
     private static int port;
