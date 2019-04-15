@@ -34,22 +34,19 @@ public class BackendHandler implements Runnable {
     private String username;
     private String repo;
     private String commitInfo;
+    private String date;
     private String localeVolumeDocker;
     private String shareVolumeDocker;
     private String logsFolder;
-    private Configurator configurator;
+    private Configurator configurator = new Configurator();
     private String pathToTargetFile;
-
-//    @Inject
     private MongoOperations mongoOperations;
 
     public BackendHandler() {}
 
-    public BackendHandler(String host, int port, Configurator configurator) {
+    public BackendHandler(String host, int port) {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         mongoOperations = context.getBean(MongoOperations.class);
-
-        this.configurator = configurator;
 
         try {
             socket = new Socket(host, port);
@@ -70,15 +67,16 @@ public class BackendHandler implements Runnable {
                     username = tmps[0];
                     repo = tmps[1];
                     commitInfo = tmps[2];
+                    date = tmps[3];
 
                     System.out.println("thread [" + Thread.currentThread().getId() + "] getting task for "
-                            + username + " " + repo);
+                            + username + " " + repo + " " + commitInfo + " " + date);
 
                     this.prepareToTesting();
                     this.startTesting();
 
                     System.out.println("thread [" + Thread.currentThread().getId() + "] finish task for "
-                            + username + " " + repo);
+                            + username + " " + repo + " " + commitInfo + " " + date);
 
                     this.afterTesting();
                 } else {
@@ -95,10 +93,10 @@ public class BackendHandler implements Runnable {
     }
 
     private void prepareToTesting() {
-        configurator.configureUserFolders(username, repo, commitInfo);
+//        configurator.configureUserFolders(username, repo, commitInfo);
         localeVolumeDocker = configurator.getReposFolder() + "/" + username + "/" + repo;
         shareVolumeDocker = localeVolumeDocker +":/media";
-        logsFolder = configurator.getResultsFolder() + "/" + username + "/" + repo + "/" + commitInfo;
+        logsFolder = configurator.getResultsFolder() + "/" + username + "/" + repo + "/" + commitInfo + "/" + date;
     }
 
     private void startTesting() {
@@ -107,7 +105,6 @@ public class BackendHandler implements Runnable {
             Content content = null;
             try {
                 content = Generator.readJSON(localeVolumeDocker);
-//                System.out.println("CONTENT: " + content.toString());
                 Generator.scriptGeneration(content, localeVolumeDocker);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -167,15 +164,13 @@ public class BackendHandler implements Runnable {
 
             // move logs
             File logs = new File(localeVolumeDocker + "/logs.txt");
-            String resultPathLogsFile = logsFolder + "/" + "logs.txt";
+            String resultPathLogsFile = logsFolder + "/logs.txt";
             logs.renameTo(new File(resultPathLogsFile));
 
             String targetFile = content.getConfig().getTargetFile();
-//            System.out.println("Targer File: " + targetFile);
             setPathToTargetFile(targetFile);
 
             // move targer file
-//            System.out.println("pathToTargetFile: " + pathToTargetFile);
             File _targerFile = new File(pathToTargetFile);
             String[] tmps = pathToTargetFile.split("/");
             String targerFilename = tmps[tmps.length - 1];
@@ -185,7 +180,6 @@ public class BackendHandler implements Runnable {
             User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(username)), User.class);
             assert u != null;
             CommitInfo new_commitInfo = u.getCommit(repo, commitInfo.split(":")[0]);
-//            System.out.println("FIND COMMIT INFO: " + new_commitInfo.toString());
             String result = resultPathLogsFile
                     + ":"
                     + resultPathTargerFile;

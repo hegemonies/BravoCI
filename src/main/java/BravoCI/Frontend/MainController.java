@@ -27,9 +27,7 @@ public class MainController {
     private MongoOperations mongoOperations;
 
     private Configurator configurator = new Configurator();
-
     private Socket socket;
-    private String USERNAME = System.getenv("USERNAME");
 
     public MainController() {
         try {
@@ -43,9 +41,6 @@ public class MainController {
             int port = Integer.parseInt(tmp_port);
 
             socket = new Socket(host, port);
-
-            if (this.USERNAME == null)
-                this.USERNAME = System.getenv("USER");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,42 +49,51 @@ public class MainController {
     @RequestMapping("/add")
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
-        String pathUserFolder = "/home/" + USERNAME + "/bravoci/repos/" + name + "/";
-        String path = configurator.getReposFolder() + "/" + name + "/" + repository;
+        String reposFolder = configurator.getReposFolder() + "/" + name + "/" + repository;
+        String date = new Date().toString().replace(" ", "_");
         Git git = null;
 
         try {
             git = Git.cloneRepository()
                 .setURI("https://github.com/" + name + "/" + repository + ".git")
-                .setDirectory(new File(pathUserFolder + repository + "/"))
+                .setDirectory(new File(reposFolder))
                 .call();
 
             Iterable<RevCommit> logs = git.log().call();
             String lastCommitName = logs.iterator().next().getName();
-            configurator.configureUserFolders(name, repository, lastCommitName);
+
+            configurator.configureUserFolders(name, repository, lastCommitName, date);
 
             if (mongoOperations.findAll(User.class).contains(new User(name))) {
                 User u = mongoOperations.findOne(Query.query(Criteria.where("name").is(name)), User.class);
                 assert u != null;
-                u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
+                u.addCommit(repository,
+                        new CommitInfo(lastCommitName,
+                                date,
+                        "",
+                        false));
                 u.addRepository(repository);
                 mongoOperations.save(u);
             } else {
                 User u = new User(name, repository);
-                u.addCommit(repository, new CommitInfo(lastCommitName, "", false));
+                u.addCommit(repository, new CommitInfo(lastCommitName,
+                        date,
+                        "",
+                        false));
                 mongoOperations.save(u);
             }
 
             WrapperQueue.addToQueue(name,
                     repository,
-                    lastCommitName + ":" + new Date().toString(),
+                    lastCommitName + ":" + date,
                     socket);
 
         } catch (GitAPIException exception) {
-            new File(pathUserFolder).delete();
+            new File(reposFolder).delete();
             exception.printStackTrace();
             return "Invalid data: Name or Repository";
         } finally {
+            assert git != null;
             git.close();
         }
 

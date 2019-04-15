@@ -4,7 +4,7 @@ function add(form) {
 	var repo = elems.Repository.value;
 
 	$.ajax({
-		url: "http://localhost:8080/add?name=" + name + "&repo=" + repo
+		url: "http://localhost:9090/add?name=" + name + "&repo=" + repo
 	}).then(function(data) {
 	    alert(data);
 	});
@@ -16,7 +16,7 @@ function search(form) {
 	$.ajax({
 		type: "POST",
 		dataType: "text",
-		url: "http://localhost:8080/search?name=" + name
+		url: "http://localhost:9090/search?name=" + name
 	}).then(function (data) {
 	    console.log(data);
 

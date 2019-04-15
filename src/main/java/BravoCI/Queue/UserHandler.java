@@ -37,19 +37,19 @@ public class UserHandler implements Runnable {
                 if (in.hasNext()) {
                     String request = in.next();
 
-                    System.out.println("queue request: " + request);
+                    System.out.print("queue request: " + request);
 
                     if (request.length() >= 3) {
                         String action = request.substring(0, 3);
 
-                        System.out.println("action: " + action);
+                        System.out.print(" action: " + action);
 
                         if (action.equals("GET")) {
                             int queueSize = queue.size();
-                            System.out.println("size of queue: " + queueSize);
+                            System.out.print(" size of queue: " + queueSize);
 
                             if (queueSize > 0) {
-                                System.out.println("answer for GET: " + queue.peek().toString());
+                                System.out.println(" answer for GET: " + queue.peek().toString());
 
                                 Package tmpPackage = queue.poll();
                                 if (tmpPackage != null) {
@@ -61,11 +61,12 @@ public class UserHandler implements Runnable {
                                 out.println(answer);
                                 out.flush();
                             }
+                            System.out.println();
                         } else if (action.equals("SET")) {
                             String content = request.substring(4);
 
                             if (content.length() >= 3 && content.contains("/")) {
-                                System.out.println("content: " + content);
+                                System.out.println(" content: " + content);
 
                                 String[] userInfo = content.split("/");
                                 String userName = userInfo[0];
