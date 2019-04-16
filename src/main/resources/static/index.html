@@ -4,43 +4,69 @@
     <meta charset="UTF-8">
     <title>BravoCI</title>
 
+    <link rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+    <div class="container">
+        <h1 class="card-panel hoverable center-align teal darken-4 white-text">
+            Welcome to BravoCI
+        </h1>
+        <div class="progress hide">
+            <div class="indeterminate"></div>
+        </div>
+        <div class="row">
+            <h5>
+                Добавление репозитория для тестирования
+            </h5>
+            <form class="col s12">
+                <div class="row">
+                    <div class="input-field col s5">
+                        <input name="Name" id="Name" type="text" class="validate">
+                        <label for="Name">Name</label>
+                    </div>
 
-    <h1>
-        Welcome to BravoCI
-    </h1>
+                    <div class="input-field col s5">
+                        <input name="Repository" id="Repository" type="text" class="validate">
+                        <label for="Repository">Repository</label>
+                    </div>
 
-    <div id="adding">
-        Добавление репозитория для тестирования
-        <form id="adding_form">
-            <b>Name</b>
-            <input type="text" size="15" name="Name" value="">
-            <b>Repository</b>
-            <input type="text" size="20" name="Repository" value="">
-            <input type="button" value="Add" onclick="add(this.form)">
-        </form>
-    </div>
+                    <div class="input-field col s2">
+                        <input type="button" value="Add" onclick="add(this.form)" class="waves-effect teal accent-2 btn-small">
+                    </div>
+                </div>
+            </form>
+        </div>
+    
+        <div class="row">
+            <h5>
+                Поиск репозитория
+            </h5>
+            <form class="col s12">
+                <div class="row">
+                    <div class="input-field col s5">
+                        <input name="Name" id="Name" type="text" class="validate">
+                        <label for="Name">Name</label>
+                    </div>
 
-    <div id="search">
-        Поиск репозитория
-        <form id="adding_form">
-            <b>Name</b>
-            <input type="text" size="15" name="Name" value="">
-            <!-- <b>Repository</b>
-            <input type="text" size="20" name="Repository" value=""> -->
-            <input type="button" value="Search" onclick="search(this.form)">
-        </form>
-
-        <div>
-            История пользователя:
-            <div id="user-history"></div>
+                    <div class="input-field col s2">
+                        <input type="button" value="Search" onclick="search(this.form)" class="waves-effect teal accent-2 btn-small">
+                    </div>
+                </div>
+            </form>
+    
+            <div>
+                <h5>
+                    История пользователя:
+                </h5>
+                <div id="user-history"></div>
+            </div>
         </div>
     </div>
 
     <script src="js/jquery-3.3.1.js"></script>
     <script src="js/handler.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
 
 </body>
 </html>

@@ -1,12 +1,18 @@
 function add(form) {
+	$('.progress').removeClass("hide");
+
     var elems = form.elements;
 	var name = elems.Name.value;
 	var repo = elems.Repository.value;
+
+	console.log(name);
+	console.log(repo);
 
 	$.ajax({
 		url: "http://localhost:9090/add?name=" + name + "&repo=" + repo
 	}).then(function(data) {
 	    alert(data);
+		$('.progress').addClass("hide");
 	});
 }
 
@@ -18,7 +24,7 @@ function search(form) {
 		dataType: "json",
 		url: "http://localhost:9090/search?name=" + name
 	}).then(function (data) {
-		var content = '<table>';
+		var content = '<table class="highlight">';
 		content += '<tr>';
 		content += '<td>' + 'Name' + '</td>';
 		content += '<td>' + 'Repositories' + '</td>';
