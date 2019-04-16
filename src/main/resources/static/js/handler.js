@@ -15,11 +15,9 @@ function search(form) {
 
 	$.ajax({
 		type: "POST",
-		dataType: "text",
+		dataType: "json",
 		url: "http://localhost:9090/search?name=" + name
 	}).then(function (data) {
-	    console.log(data);
-
 		var content = '<table>';
 		content += '<tr>';
 		content += '<td>' + 'Name' + '</td>';
@@ -27,20 +25,29 @@ function search(form) {
 		content += '<td>' + 'Commits' + '</td>';
 		content += '</tr>';
 
-		var json = JSON.parse(data);
-
-		for (var i = 0; i < json.length; i++) {
+		for (var i = 0; i < data.repositories.length; i++) {
 			content += '<tr>';
 
-			content += '<td>' + json[i]['name'] + '</td>';
-
-			for (var j = 0; j < json[i].repositories.length; j++) {
-				content += '<td>' + json[i].repositories[j]['name'] + '</td>';
-
-				for (var k = 0; k < json[i].repositories[j].length; k++) {
-					content += '<td>' + json[i].repositories[j]['commitInfos'][k] + '</td>';
-					content += '</tr>';
+			for (var j = 0; j < data.repositories[i].commitInfos.length; j++) {
+				if (i == 0 && j == 0) {
+					content += '<td>' + data.name + '</td>';
+				} else {
+					content += '<td>' + '</td>';
 				}
+
+				if (j == 0) {
+					content += '<td>' + data.repositories[i].name + '</td>';
+				} else {
+					content += '<td>' + '</td>';
+				}
+
+				var commitInfo = data.repositories[i].commitInfos[j].date + '<br>' +
+						data.repositories[i].commitInfos[j].hashCommit + '<br>' +
+						data.repositories[i].commitInfos[j].result + '<br>' +
+						data.repositories[i].commitInfos[j].check;
+				content += '<td>' + commitInfo + '</td>';
+
+				content += '</tr>';
 			}
 		}
 
