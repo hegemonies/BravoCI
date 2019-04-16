@@ -50,7 +50,7 @@ public class MainController {
     public String addUser(@RequestParam(name = "name", required = true) String name,
                           @RequestParam(name = "repo", required = true) String repository) {
         String reposFolder = configurator.getReposFolder() + "/" + name + "/" + repository;
-        String date = new Date().toString().replace(" ", "_");
+        String date = new Date().toString().replace(" ", "_").replace(":", "-");
         Git git = null;
 
         try {

@@ -59,7 +59,8 @@ public class Configurator {
         File concrLogsFolder = new File(resultsFolder+ "/"
                 + name + "/"
                 + repo + "/"
-                + commitName+ date);
+                + commitName + "/"
+                + date);
         if (!concrLogsFolder.exists()) {
             concrLogsFolder.mkdir();
         }
