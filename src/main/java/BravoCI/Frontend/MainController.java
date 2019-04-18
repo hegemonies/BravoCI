@@ -62,6 +62,8 @@ public class MainController {
             Iterable<RevCommit> logs = git.log().call();
             String lastCommitName = logs.iterator().next().getName();
 
+            System.out.println("!!!!!!!lastCommitName: " + lastCommitName);
+
             configurator.configureUserFolders(name, repository, lastCommitName, date);
 
             if (mongoOperations.findAll(User.class).contains(new User(name))) {
@@ -93,8 +95,8 @@ public class MainController {
             exception.printStackTrace();
             return "Invalid data: Name or Repository";
         } finally {
-            assert git != null;
-            git.close();
+            // assert git != null;
+            // git.close();
         }
 
         return "Your request is being processed";

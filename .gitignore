@@ -3,6 +3,8 @@ out/
 target/
 .idea/
 .gradle/
+.project
+.settings/
 
 # BravoCI folders
 repos/

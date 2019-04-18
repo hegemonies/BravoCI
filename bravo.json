@@ -9,7 +9,7 @@
     },
     {
       "title": "Step2",
-      "cmd": "gradle run"
+      "cmd": "gradle bootRun"
     },
     {
       "title": "Step3",

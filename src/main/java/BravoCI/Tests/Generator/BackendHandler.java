@@ -136,6 +136,7 @@ public class BackendHandler implements Runnable {
                 // create a running container with bind mounts
                 CreateContainerResponse container = dockerClient.createContainerCmd(imageTag)
                         .withHostConfig(newHostConfig().withBinds(Bind.parse(shareVolumeDocker)))
+			            .withUser("1013:1013")
                         .exec();
                 dockerClient.startContainerCmd(container.getId()).exec();
 
@@ -190,11 +191,11 @@ public class BackendHandler implements Runnable {
             mongoOperations.save(u);
         } finally {
             // delete repo
-            try {
-                FileUtils.deleteDirectory(new File(localeVolumeDocker));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // try {
+            //     FileUtils.deleteDirectory(new File(localeVolumeDocker));
+            // } catch (IOException e) {
+            //     e.printStackTrace();
+            // }
         }
     }
 
@@ -243,5 +244,7 @@ public class BackendHandler implements Runnable {
         System.out.println("LOOK HERE: " + configurator.getReposFolder() + "/" + username + "/" + repo);
         File thisFolder = new File(configurator.getReposFolder() + "/" + username + "/" + repo);
         processFilesFromFolder(thisFolder, filename);
+        System.out.println("!!!!!filename: " + filename);
+        System.out.println("!!!!!pathToTargetFile: " + pathToTargetFile);
     }
 }
