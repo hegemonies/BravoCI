@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  mongodb:
+    image: mongo:latest
+  bravo-ci:
+    image: localhost:5000/bravo-ci
+    ports:
+      - 9090:9090
