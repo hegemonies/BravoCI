@@ -15,7 +15,6 @@ import java.util.Properties;
 
 @SpringBootApplication
 @Import(AppConfig.class)
-@ComponentScan("BravoCI")
 public class Core {
     private static String host;
     private static int port;
