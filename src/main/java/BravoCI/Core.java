@@ -30,12 +30,11 @@ public class Core {
         try {
             Properties properties = new Properties();
             String propPath = new File(".").getAbsolutePath();
-            propPath = propPath.substring(0, propPath.length() - 1) + "src/main/resources/queue.properties";
+            propPath = propPath.substring(0, propPath.length() - 1) + "queue.properties";
             properties.load(new FileReader(propPath));
 
             host = properties.getProperty("queue-host");
-            String tmp_port = properties.getProperty("queue-port");
-            port = Integer.parseInt(tmp_port);
+            port = Integer.parseInt(properties.getProperty("queue-port"));
         } catch (IOException e) {
             e.printStackTrace();
         }

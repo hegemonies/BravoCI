@@ -9,7 +9,7 @@ function add(form) {
 	console.log(repo);
 
 	$.ajax({
-		url: "http://91.196.245.199:9090/add?name=" + name + "&repo=" + repo
+		url: "http://localhost:9090/add?name=" + name + "&repo=" + repo
 	}).then(function(data) {
 	    alert(data);
 		$('.progress').addClass("hide");
@@ -22,7 +22,7 @@ function search(form) {
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: "http://91.196.245.199:9090/search?name=" + name
+		url: "http://localhost:9090/search?name=" + name
 	}).then(function (data) {
 		var content = '<table class="highlight">';
 		content += '<tr>';
